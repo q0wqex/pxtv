@@ -6,7 +6,6 @@
   <meta name="theme-color" content="#0d0d12">
   <title>Prizrak-Box — Импорт на TV</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
-  <!-- qr-scanner by Nimiq — works great on Safari/iOS via WebAssembly -->
   <script type="module">
     import QrScanner from 'https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js';
     window._QrScanner = QrScanner;
@@ -43,7 +42,6 @@
       overflow: hidden;
     }
 
-    /* Background grid */
     body::before {
       content: '';
       position: fixed;
@@ -55,7 +53,6 @@
       pointer-events: none;
     }
 
-    /* Glow blob */
     body::after {
       content: '';
       position: fixed;
@@ -85,7 +82,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Corner accent */
     .card::before {
       content: '';
       position: absolute;
@@ -134,7 +130,7 @@
 
     textarea {
       width: 100%;
-      min-height: 130px;
+      min-height: 78px;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -155,7 +151,6 @@
 
     textarea::placeholder { color: var(--muted); font-family: 'DM Sans', sans-serif; }
 
-    /* TV address display */
     .tv-address {
       display: none;
       margin-top: 14px;
@@ -210,7 +205,7 @@
       color: var(--text);
       border-radius: 14px;
       font-size: 13px;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -218,6 +213,7 @@
 
     #btn-scan:hover { border-color: var(--accent); color: var(--accent2); }
 
+    /* Submit / Confirm button — hidden until TV scanned */
     #btn-submit {
       flex: 2 1 auto;
       height: 48px;
@@ -225,13 +221,15 @@
       color: #fff;
       border-radius: 14px;
       font-size: 14px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: none; /* hidden by default */
+      align-items: center; justify-content: center; gap: 8px;
       box-shadow: 0 4px 20px rgba(124,92,252,.35);
       letter-spacing: .2px;
       white-space: nowrap;
       overflow: hidden;
     }
 
+    #btn-submit.visible { display: flex; }
     #btn-submit:hover { background: linear-gradient(135deg, #8b6cff, #a97dff); box-shadow: 0 6px 28px rgba(124,92,252,.5); transform: translateY(-1px); }
     #btn-submit:active { transform: translateY(0); }
     #btn-submit:disabled { opacity: .45; cursor: not-allowed; transform: none; }
@@ -303,6 +301,9 @@
       font-size: 17px;
       font-weight: 700;
       color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .modal-close {
@@ -334,7 +335,6 @@
       display: block;
     }
 
-    /* Scanning frame overlay */
     .scan-frame {
       position: absolute;
       inset: 0;
@@ -364,7 +364,6 @@
       border-radius: 0 0 4px 0;
     }
 
-    /* Extra corners via a child */
     .scan-frame .corner-tr, .scan-frame .corner-bl {
       position: absolute;
       width: 50%; height: 50%;
@@ -387,9 +386,9 @@
     }
 
     @keyframes scanMove {
-      0%   { top: 20%; opacity: 1; }
-      50%  { top: 76%; opacity: 1; }
-      100% { top: 20%; opacity: 1; }
+      0%   { top: 20%; }
+      50%  { top: 76%; }
+      100% { top: 20%; }
     }
 
     .scan-hint {
@@ -415,6 +414,7 @@
     #scan-status.found { display: block; background: var(--success-bg); color: var(--success); border: 1px solid rgba(52,211,153,.2); }
     #scan-status.bad   { display: block; background: var(--error-bg);   color: var(--error);   border: 1px solid rgba(248,113,113,.2); }
 
+    /* Manual fallback — two fields */
     .manual-fallback {
       margin-top: 16px;
       padding-top: 16px;
@@ -433,10 +433,17 @@
     .manual-row {
       display: flex;
       gap: 8px;
+      align-items: stretch;
+    }
+
+    .manual-ip-wrap {
+      flex: 1;
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
 
     .manual-row input {
-      flex: 1;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -446,6 +453,7 @@
       color: var(--text);
       outline: none;
       transition: border-color .2s;
+      min-width: 0;
     }
 
     .manual-row input:focus {
@@ -454,6 +462,18 @@
     }
 
     .manual-row input::placeholder { color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; }
+
+    #manual-ip  { flex: 1; }
+    #manual-port { width: 80px; flex-shrink: 0; }
+
+    .manual-sep {
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 1;
+      align-self: center;
+      flex-shrink: 0;
+    }
 
     #btn-manual-ok {
       padding: 0 18px;
@@ -467,6 +487,7 @@
       cursor: pointer;
       transition: background .2s;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     #btn-manual-ok:hover { background: #8b6cff; }
@@ -484,6 +505,10 @@
       font-weight: 500;
       cursor: pointer;
       transition: border-color .2s, color .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     #btn-photo:hover { border-color: var(--accent2); color: var(--accent2); }
@@ -526,13 +551,13 @@
     <div class="header">
       <div class="logo-wrap">
         <svg width="36" height="36" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="50" height="50" rx="12" fill="#FAFAFA"/>
-<path d="M16.519 18.4845C20.3639 15.5401 19.5043 8.43845 25.5007 8.02291C33.2105 7.48864 31.627 16.4316 35.9102 20.9755C37.7728 22.9515 40.6866 20.2735 42.9969 24.2991C43.5516 25.2656 42.3157 25.9003 41.9326 26.9469C41.6858 27.6212 42.0469 28.5879 41.3356 28.6861C40.8008 28.7599 40.7312 27.8598 40.1934 27.9073C39.4708 27.9711 39.5785 28.8762 39.3627 29.5687C39.1434 30.2722 39.6046 30.8978 39.1031 31.4377C38.6755 31.8981 38.1616 31.7148 37.5715 31.9309C36.7954 32.2153 36.4479 32.8363 35.6246 32.7616C33.6258 33.2289 34.6642 30.1897 33.6258 30.9186C32.8696 31.2003 32.9645 32.0023 32.6913 32.7616C32.3217 33.7889 32.5443 34.4779 32.1981 35.5133C31.9248 36.3305 31.9241 36.9588 31.2636 37.5121C30.4392 38.2025 29.5223 37.469 28.5379 37.9015C27.6449 38.2938 27.4682 39.0648 26.565 39.433C25.6123 39.8215 24.9507 39.4839 23.9432 39.6926C22.7231 39.9453 23.0087 42.001 19.4523 42.001C15.5585 42.001 16.6042 39.3379 14.624 38.7841C12.9879 38.3265 10.9987 39.2893 9.5101 38.4706C7.79682 37.2246 8.69139 35.8487 8.316 35.3555C8.15793 35.1479 7.95257 34.9661 6.8623 34.8104C7.45936 34.1355 8.70037 34.0238 9.38031 34.447C10.205 34.9602 9.56982 36.0004 10.2889 36.6535C11.4288 37.6888 12.9175 37.0968 14.0529 36.0564C14.9801 35.2067 15.4964 34.3272 14.8836 33.2289C14.3945 32.3524 12.7639 32.7683 12.0541 32.0588C16.6747 31.5655 17.765 27.7256 17.765 27.7256C17.765 27.7256 16.0244 30.2636 14.8836 29.5687C14.1053 29.0946 14.7147 28.0146 14.0529 27.3882C12.9151 26.3111 11.0686 28.9205 10.0552 27.7256C9.18772 26.7027 10.8597 25.5128 10.2889 24.2991C9.77 23.1959 7.84874 23.4924 7.84874 22.3522C8.316 19.0534 13.1644 21.0535 16.519 18.4845Z" fill="#0A0A0A"/>
-<path d="M16.5192 18.4845C20.364 15.5401 19.5044 8.43845 25.5008 8.02291C33.2106 7.48864 31.6272 16.4316 35.9104 20.9756C37.773 22.9516 40.6868 20.2735 42.9971 24.2991C42.3654 23.8398 40.7438 23.3366 39.3109 24.998C38.854 23.6274 37.8572 24.8076 37.5457 25.3095C36.7884 26.5295 36.5229 28.4038 37.2082 29.3591C36.5333 30.7349 35.016 30.4493 34.6643 30.1378C33.7557 29.3331 33.7038 25.4393 33.4702 24.1154C33.4442 26.2613 32.9147 30.7245 31.0041 31.4098C28.6159 32.2664 27.4478 31.8251 27.0843 33.0971C26.7936 34.1147 27.5516 34.7498 27.9669 34.9402C27.6468 35.6497 26.5807 37.0117 24.8778 36.7833C22.7492 36.4977 21.6589 35.044 21.2436 34.7585C20.8283 34.4729 19.8937 34.3172 19.0371 34.6027C18.3179 34.8425 17.0805 35.667 17.194 36.7833C17.2785 37.6139 18.5179 37.6918 17.5055 38.1331C16.0456 38.7695 15.1173 37.588 15.2212 37.0169C14.728 37.1467 13.1704 36.965 13.7675 35.3555C14.0605 34.5658 14.6241 33.9538 14.3126 33.2788C13.892 32.3675 12.7641 32.7683 12.0542 32.0588C16.6749 31.5656 17.7651 27.7256 17.7651 27.7256C17.7651 27.7256 16.8654 29.0487 15.9615 29.5007C16.9739 28.4624 17.0642 24.6865 15.1173 24.7903C14.7539 24.9461 14.6241 25.2057 14.5462 25.8287C12.7032 25.6729 13.4076 23.6481 12.5993 22.7136C11.7687 21.7531 8.57572 20.4812 7.84888 22.3522C8.31613 19.0534 13.1645 21.0535 16.5192 18.4845Z" fill="#FAFAFA" stroke="#0A0A0A" stroke-linejoin="round"/>
-<ellipse cx="23.451" cy="15.017" rx="1.78635" ry="3.18529" transform="rotate(7.04122 23.451 15.017)" fill="#0A0A0A"/>
-<ellipse cx="1.78635" cy="3.18529" rx="1.78635" ry="3.18529" transform="matrix(-0.992458 0.122583 0.122583 0.992458 29.7302 11.6367)" fill="#0A0A0A"/>
-<ellipse cx="25.9047" cy="20.9553" rx="1.31286" ry="2.3244" fill="#0A0A0A"/>
-</svg>
+          <rect width="50" height="50" rx="12" fill="#FAFAFA"/>
+          <path d="M16.519 18.4845C20.3639 15.5401 19.5043 8.43845 25.5007 8.02291C33.2105 7.48864 31.627 16.4316 35.9102 20.9755C37.7728 22.9515 40.6866 20.2735 42.9969 24.2991C43.5516 25.2656 42.3157 25.9003 41.9326 26.9469C41.6858 27.6212 42.0469 28.5879 41.3356 28.6861C40.8008 28.7599 40.7312 27.8598 40.1934 27.9073C39.4708 27.9711 39.5785 28.8762 39.3627 29.5687C39.1434 30.2722 39.6046 30.8978 39.1031 31.4377C38.6755 31.8981 38.1616 31.7148 37.5715 31.9309C36.7954 32.2153 36.4479 32.8363 35.6246 32.7616C33.6258 33.2289 34.6642 30.1897 33.6258 30.9186C32.8696 31.2003 32.9645 32.0023 32.6913 32.7616C32.3217 33.7889 32.5443 34.4779 32.1981 35.5133C31.9248 36.3305 31.9241 36.9588 31.2636 37.5121C30.4392 38.2025 29.5223 37.469 28.5379 37.9015C27.6449 38.2938 27.4682 39.0648 26.565 39.433C25.6123 39.8215 24.9507 39.4839 23.9432 39.6926C22.7231 39.9453 23.0087 42.001 19.4523 42.001C15.5585 42.001 16.6042 39.3379 14.624 38.7841C12.9879 38.3265 10.9987 39.2893 9.5101 38.4706C7.79682 37.2246 8.69139 35.8487 8.316 35.3555C8.15793 35.1479 7.95257 34.9661 6.8623 34.8104C7.45936 34.1355 8.70037 34.0238 9.38031 34.447C10.205 34.9602 9.56982 36.0004 10.2889 36.6535C11.4288 37.6888 12.9175 37.0968 14.0529 36.0564C14.9801 35.2067 15.4964 34.3272 14.8836 33.2289C14.3945 32.3524 12.7639 32.7683 12.0541 32.0588C16.6747 31.5655 17.765 27.7256 17.765 27.7256C17.765 27.7256 16.0244 30.2636 14.8836 29.5687C14.1053 29.0946 14.7147 28.0146 14.0529 27.3882C12.9151 26.3111 11.0686 28.9205 10.0552 27.7256C9.18772 26.7027 10.8597 25.5128 10.2889 24.2991C9.77 23.1959 7.84874 23.4924 7.84874 22.3522C8.316 19.0534 13.1644 21.0535 16.519 18.4845Z" fill="#0A0A0A"/>
+          <path d="M16.5192 18.4845C20.364 15.5401 19.5044 8.43845 25.5008 8.02291C33.2106 7.48864 31.6272 16.4316 35.9104 20.9756C37.773 22.9516 40.6868 20.2735 42.9971 24.2991C42.3654 23.8398 40.7438 23.3366 39.3109 24.998C38.854 23.6274 37.8572 24.8076 37.5457 25.3095C36.7884 26.5295 36.5229 28.4038 37.2082 29.3591C36.5333 30.7349 35.016 30.4493 34.6643 30.1378C33.7557 29.3331 33.7038 25.4393 33.4702 24.1154C33.4442 26.2613 32.9147 30.7245 31.0041 31.4098C28.6159 32.2664 27.4478 31.8251 27.0843 33.0971C26.7936 34.1147 27.5516 34.7498 27.9669 34.9402C27.6468 35.6497 26.5807 37.0117 24.8778 36.7833C22.7492 36.4977 21.6589 35.044 21.2436 34.7585C20.8283 34.4729 19.8937 34.3172 19.0371 34.6027C18.3179 34.8425 17.0805 35.667 17.194 36.7833C17.2785 37.6139 18.5179 37.6918 17.5055 38.1331C16.0456 38.7695 15.1173 37.588 15.2212 37.0169C14.728 37.1467 13.1704 36.965 13.7675 35.3555C14.0605 34.5658 14.6241 33.9538 14.3126 33.2788C13.892 32.3675 12.7641 32.7683 12.0542 32.0588C16.6749 31.5656 17.7651 27.7256 17.7651 27.7256C17.7651 27.7256 16.8654 29.0487 15.9615 29.5007C16.9739 28.4624 17.0642 24.6865 15.1173 24.7903C14.7539 24.9461 14.6241 25.2057 14.5462 25.8287C12.7032 25.6729 13.4076 23.6481 12.5993 22.7136C11.7687 21.7531 8.57572 20.4812 7.84888 22.3522C8.31613 19.0534 13.1645 21.0535 16.5192 18.4845Z" fill="#FAFAFA" stroke="#0A0A0A" stroke-linejoin="round"/>
+          <ellipse cx="23.451" cy="15.017" rx="1.78635" ry="3.18529" transform="rotate(7.04122 23.451 15.017)" fill="#0A0A0A"/>
+          <ellipse cx="1.78635" cy="3.18529" rx="1.78635" ry="3.18529" transform="matrix(-0.992458 0.122583 0.122583 0.992458 29.7302 11.6367)" fill="#0A0A0A"/>
+          <ellipse cx="25.9047" cy="20.9553" rx="1.31286" ry="2.3244" fill="#0A0A0A"/>
+        </svg>
       </div>
       <div class="header-text">
         <h1>Prizrak-Box</h1>
@@ -545,14 +570,16 @@
       <span>URL подставлен из параметра запроса</span>
     </div>
 
-    <div class="field-label">Ссылка на подписку</div>
+    <div class="field-label" id="field-label">Ссылка на подписку</div>
     <textarea
       id="content"
       placeholder="Вставьте ссылку (https://, clash://, sub://) или YAML..."></textarea>
 
     <!-- TV address after scan -->
     <div class="tv-address" id="tv-address">
-      <span class="tv-icon">📺</span>
+      <span class="tv-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2l0 -9" /><path d="M16 3l-4 4l-4 -4" /></svg>
+      </span>
       <div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:2px;">Адрес TV</div>
         <div class="tv-url" id="tv-url-text"></div>
@@ -562,23 +589,22 @@
 
     <div class="btn-row">
       <button id="btn-scan" onclick="openScanner()">
-        📷 Сканировать TV
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" /><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>
+        Сканировать TV
       </button>
-      <button id="btn-submit" onclick="send()">
-        <span id="btn-icon">📡</span>
-        <span id="btn-text">Отправить на TV</span>
-        <span class="spinner" id="spinner"></span>
+      <button id="btn-submit" onclick="confirm()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2l0 -9" /><path d="M16 3l-4 4l-4 -4" /></svg>
+        <span id="btn-text">Подтвердить добавление</span>
       </button>
     </div>
 
     <div id="status"></div>
 
-    <div class="hint-block">
+    <div class="hint-block" id="hint-block">
       <strong>Как использовать:</strong><br>
       1. Вставьте ссылку на подписку или YAML в поле<br>
       2. Нажмите «Сканировать TV» и отсканируйте QR с экрана TV<br>
-      3. Нажмите «Отправить на TV»<br><br>
-      <strong>URL-параметр:</strong> добавьте <code style="color:var(--text)">?url=...</code> для автозаполнения поля
+      3. Нажмите «Подтвердить добавление»
     </div>
   </div>
 
@@ -586,7 +612,10 @@
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <div class="modal-head">
-        <div class="modal-title">📷 Сканировать QR с TV</div>
+        <div class="modal-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" /><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>
+          Сканировать QR с TV
+        </div>
         <button class="modal-close" onclick="closeScanner()">✕</button>
       </div>
       <div class="scanner-wrap">
@@ -599,9 +628,9 @@
       </div>
       <div id="scan-status"></div>
 
-      <!-- Photo upload button -->
       <button id="btn-photo" onclick="triggerPhotoUpload()">
-        🖼 Загрузить скриншот с QR
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4" /><path d="M7 17l0 .01" /><path d="M14 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4" /><path d="M7 7l0 .01" /><path d="M4 15a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4" /><path d="M17 7l0 .01" /><path d="M14 14l3 0" /><path d="M20 14l0 .01" /><path d="M14 14l0 3" /><path d="M14 20l3 0" /><path d="M17 17l3 0" /><path d="M20 17l0 3" /></svg>
+        Загрузить скриншот с QR
       </button>
       <input type="file" id="photo-input" accept="image/*" style="display:none">
 
@@ -610,19 +639,33 @@
         Ожидается ссылка вида <span>http://192.168.x.x:port/...</span>
       </div>
 
-      <!-- Manual fallback -->
+      <!-- Manual fallback — IP + Port -->
       <div class="manual-fallback">
         <div class="manual-label">Или введите адрес вручную</div>
         <div class="manual-row">
-          <input
-            id="manual-url"
-            type="url"
-            placeholder="http://192.168.1.135:55725/Prizrak-BoxTVimport"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="none"
-            spellcheck="false"
-          />
+          <div class="manual-ip-wrap">
+            <input
+              id="manual-ip"
+              type="text"
+              placeholder="192.168.1.135"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
+              inputmode="decimal"
+            />
+            <span class="manual-sep">:</span>
+            <input
+              id="manual-port"
+              type="text"
+              placeholder="55725"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
+              inputmode="numeric"
+            />
+          </div>
           <button id="btn-manual-ok" onclick="applyManualUrl()">OK</button>
         </div>
       </div>
@@ -635,26 +678,42 @@
     let videoStream = null;
     let scanTimer = null;
     let scanning = false;
-    let nimiqScanner = null; // QrScanner instance (best for Safari)
+    let nimiqScanner = null;
 
     const hasBarcodeDetector = 'BarcodeDetector' in window;
-    // QrScanner loaded async via ES module — access via window._QrScanner
     const getQrScanner = () => window._QrScanner || null;
 
     // ── URL param prefill ─────────────────────────────────────
-    (function prefillFromUrl() {
+    const _prefillUrl = (function prefillFromUrl() {
       const params = new URLSearchParams(window.location.search);
       const url = params.get('url');
       if (url) {
         document.getElementById('content').value = url;
-        document.getElementById('prefill-badge').classList.add('visible');
+        // Show badge briefly
+        const badge = document.getElementById('prefill-badge');
+        badge.classList.add('visible');
         setTimeout(() => {
-          const badge = document.getElementById('prefill-badge');
           badge.style.opacity = '0';
           setTimeout(() => badge.classList.remove('visible'), 500);
         }, 2000);
+        // Hide hint text about ?url= param since it's already used
+        const hint = document.getElementById('hint-block');
+        hint.innerHTML = '<strong>Как использовать:</strong><br>1. Нажмите «Сканировать TV» и отсканируйте QR с экрана TV<br>2. Нажмите «Подтвердить добавление»';
+        // Hide placeholder text variation
+        document.getElementById('content').placeholder = '';
       }
+      return url;
     })();
+
+    // ── Show/hide submit button based on TV scan state ────────
+    function updateSubmitVisibility() {
+      const btn = document.getElementById('btn-submit');
+      if (tvBaseUrl) {
+        btn.classList.add('visible');
+      } else {
+        btn.classList.remove('visible');
+      }
+    }
 
     // ── Open / Close Modal ────────────────────────────────────
     async function openScanner() {
@@ -665,7 +724,6 @@
       const QrScanner = getQrScanner();
       const video = document.getElementById('qr-video');
 
-      // Prefer Nimiq QrScanner (Safari-friendly, WASM-powered)
       if (QrScanner) {
         try {
           nimiqScanner = new QrScanner(
@@ -679,14 +737,12 @@
             }
           );
           await nimiqScanner.start();
-          return; // Nimiq handles everything
+          return;
         } catch(e) {
           nimiqScanner = null;
-          // fall through to manual camera
         }
       }
 
-      // Fallback: manual camera + BarcodeDetector / jsQR
       await startCameraManual();
     }
 
@@ -710,7 +766,7 @@
       document.getElementById('modal').classList.remove('open');
     }
 
-    // ── Manual camera fallback (BarcodeDetector / jsQR) ───────
+    // ── Manual camera fallback ────────────────────────────────
     async function startCameraManual() {
       try {
         videoStream = await navigator.mediaDevices.getUserMedia({
@@ -736,7 +792,6 @@
 
       let result = null;
 
-      // Method 1: native BarcodeDetector (Chrome Android)
       if (hasBarcodeDetector) {
         try {
           const detector = new BarcodeDetector({ formats: ['qr_code'] });
@@ -745,7 +800,6 @@
         } catch(e) {}
       }
 
-      // Method 2: jsQR with binarization
       if (!result) {
         try {
           const canvas = document.createElement('canvas');
@@ -773,7 +827,7 @@
       else scheduleNextScan();
     }
 
-    // ── Scan from photo ────────────────────────────────────────
+    // ── Photo upload ──────────────────────────────────────────
     function triggerPhotoUpload() {
       document.getElementById('photo-input').click();
     }
@@ -787,7 +841,6 @@
         const imgUrl = URL.createObjectURL(file);
         let result = null;
 
-        // Try Nimiq QrScanner.scanImage (works on Safari)
         const QrScanner = getQrScanner();
         if (QrScanner) {
           try {
@@ -796,7 +849,6 @@
           } catch(e) {}
         }
 
-        // Try BarcodeDetector
         if (!result && hasBarcodeDetector) {
           try {
             const img = await createImageBitmap(file);
@@ -806,7 +858,6 @@
           } catch(e) {}
         }
 
-        // jsQR fallback
         if (!result) {
           const img = new Image();
           await new Promise(res => { img.onload = res; img.src = imgUrl; });
@@ -826,7 +877,7 @@
       });
     });
 
-    // ── Handle result ─────────────────────────────────────────
+    // ── Handle QR result ──────────────────────────────────────
     function handleQrResult(data) {
       scanning = false;
       if (scanTimer) { clearTimeout(scanTimer); scanTimer = null; }
@@ -836,6 +887,7 @@
         setScanStatus('found', '✅ TV обнаружен: ' + base);
         document.getElementById('tv-url-text').textContent = base;
         document.getElementById('tv-address').classList.add('visible');
+        updateSubmitVisibility();
         setTimeout(() => closeScanner(), 1000);
       } catch (e) {
         setScanStatus('bad', '⚠️ Неверный QR: ' + data);
@@ -844,19 +896,22 @@
       }
     }
 
-    // ── Manual input ──────────────────────────────────────────
+    // ── Manual input — IP + Port ──────────────────────────────
     function applyManualUrl() {
-      const val = document.getElementById('manual-url').value.trim();
-      if (!val) return;
+      const ip = document.getElementById('manual-ip').value.trim();
+      const port = document.getElementById('manual-port').value.trim();
+      if (!ip || !port) { setScanStatus('bad', '⚠️ Введите IP и порт'); return; }
+      const urlStr = 'http://' + ip + ':' + port;
       try {
-        const base = new URL(val).origin;
+        const base = new URL(urlStr).origin;
         tvBaseUrl = base;
         document.getElementById('tv-url-text').textContent = base;
         document.getElementById('tv-address').classList.add('visible');
         setScanStatus('found', '✅ Адрес принят: ' + base);
+        updateSubmitVisibility();
         setTimeout(() => closeScanner(), 800);
       } catch (e) {
-        setScanStatus('bad', '⚠️ Неверный URL');
+        setScanStatus('bad', '⚠️ Неверный адрес');
       }
     }
 
@@ -871,58 +926,34 @@
       tvBaseUrl = null;
       document.getElementById('tv-address').classList.remove('visible');
       document.getElementById('tv-url-text').textContent = '';
+      updateSubmitVisibility();
     });
 
-    // ── Send ──────────────────────────────────────────────────
-    async function send() {
+    // ── Confirm — open URL in browser ─────────────────────────
+    function confirm() {
       const content = document.getElementById('content').value.trim();
       if (!content) { showStatus('error', '❌ Поле не может быть пустым'); return; }
       if (!tvBaseUrl) { showStatus('error', '📷 Сначала укажите адрес TV'); return; }
 
-      const btn = document.getElementById('btn-submit');
-      const icon = document.getElementById('btn-icon');
-      const text = document.getElementById('btn-text');
-      const spinner = document.getElementById('spinner');
-
-      btn.disabled = true; icon.style.display = 'none';
-      spinner.style.display = 'inline-block'; text.textContent = 'Отправка...';
-      clearStatus();
-
-      try {
-        const res = await fetch(tvBaseUrl + '/Prizrak-BoxTVimport/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content })
-        });
-        const data = await res.json();
-        if (data.status === 'ok') {
-          showStatus('success', '✅ Профиль успешно передан на TV!');
-          document.getElementById('content').value = '';
-        } else {
-          showStatus('error', '❌ ' + (data.message || 'Неизвестная ошибка'));
-        }
-      } catch (e) {
-        showStatus('error', '❌ Нет связи с TV (' + tvBaseUrl + ')');
-      } finally {
-        btn.disabled = false; icon.style.display = 'inline';
-        spinner.style.display = 'none'; text.textContent = 'Отправить на TV';
-      }
+      const targetUrl = tvBaseUrl + '/Prizrak-BoxTVimport?url=' + encodeURIComponent(content);
+      window.location.href = targetUrl;
     }
 
     function showStatus(type, msg) {
       const el = document.getElementById('status');
       el.className = type; el.textContent = msg; el.style.display = 'block';
     }
-    function clearStatus() {
-      const el = document.getElementById('status');
-      el.className = ''; el.style.display = 'none';
-    }
 
-    document.getElementById('content').addEventListener('keydown', e => {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) send();
-    });
-    document.getElementById('manual-url').addEventListener('keydown', e => {
-      if (e.key === 'Enter') applyManualUrl();
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('content').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) confirm();
+      });
+      document.getElementById('manual-ip').addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('manual-port').focus();
+      });
+      document.getElementById('manual-port').addEventListener('keydown', e => {
+        if (e.key === 'Enter') applyManualUrl();
+      });
     });
   </script>
 </body>
